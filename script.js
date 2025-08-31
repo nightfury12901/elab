@@ -1,279 +1,294 @@
 class ElabAnswers {
     constructor() {
-        this.questions = dsaQuestions;
-        this.searchInput = document.getElementById('searchInput');
-        this.searchBtn = document.getElementById('searchBtn');
-        this.resultsSection = document.getElementById('resultsSection');
-        this.resultsContent = document.getElementById('resultsContent');
-        this.notFoundSection = document.getElementById('notFoundSection');
+        // Check if dsaQuestions is available
+        if (typeof dsaQuestions === 'undefined') {
+            console.error('dsaQuestions is not defined. Make sure data.js is loaded first.');
+            return;
+        }
         
-        this.initializeEventListeners();
+        this.questions = dsaQuestions;
+        this.filteredQuestions = [...this.questions];
+        this.currentPage = 1;
+        this.questionsPerPage = 10;
+        this.init();
     }
 
-    initializeEventListeners() {
-        // Search button click
-        this.searchBtn.addEventListener('click', () => this.performSearch());
+    init() {
+        this.renderQuestions();
+        this.renderPagination();
+        this.bindEvents();
+        this.populateSearchSuggestions();
+    }
+
+    bindEvents() {
+        // Search functionality
+        const searchBtn = document.getElementById('searchBtn');
+        const searchInput = document.getElementById('searchInput');
         
-        // Enter key press
-        this.searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.performSearch();
-            }
+        if (searchBtn) {
+            searchBtn.addEventListener('click', () => this.performSearch());
+        }
+        
+        if (searchInput) {
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.performSearch();
+                }
+            });
+            
+            searchInput.addEventListener('input', () => this.showSearchSuggestions());
+        }
+
+        // Category filter buttons
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const category = e.target.dataset.category;
+                this.filterByCategory(category);
+                
+                // Update active button
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+            });
         });
 
-        // Input change for real-time search
-        this.searchInput.addEventListener('input', () => {
-            if (this.searchInput.value.length > 2) {
-                this.showSearchSuggestions();
-            }
-        });
+        // Clear filters
+        const clearBtn = document.getElementById('clearFilters');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => this.clearFilters());
+        }
     }
 
     performSearch() {
-        const query = this.searchInput.value.trim().toLowerCase();
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
         
         if (!query) {
-            this.showError('Please enter a search query');
+            this.filteredQuestions = [...this.questions];
+        } else {
+            this.filteredQuestions = this.questions.filter(q => 
+                q.question.toLowerCase().includes(query) ||
+                q.description.toLowerCase().includes(query) ||
+                q.category.toLowerCase().includes(query) ||
+                q.keywords.some(keyword => keyword.toLowerCase().includes(query))
+            );
+        }
+        
+        this.currentPage = 1;
+        this.renderQuestions();
+        this.renderPagination();
+        this.hideSearchSuggestions();
+    }
+
+    showSearchSuggestions() {
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        const suggestionsDiv = document.getElementById('searchSuggestions');
+        
+        if (!suggestionsDiv) return;
+        
+        if (query.length < 2) {
+            suggestionsDiv.style.display = 'none';
             return;
         }
 
-        this.showLoading(true);
+        const suggestions = new Set();
         
-        // Simulate API delay for better UX
-        setTimeout(() => {
-            const results = this.searchQuestions(query);
-            this.showLoading(false);
-            
-            if (results.length > 0) {
-                this.displayResults(results);
-            } else {
-                this.showNotFound();
-            }
-        }, 800);
-    }
-
-    searchQuestions(query) {
-        const searchTerms = query.split(' ').filter(term => term.length > 1);
-        
-        return this.questions.filter(question => {
-            const searchText = [
-                question.question,
-                question.description,
-                question.category,
-                ...question.keywords
-            ].join(' ').toLowerCase();
-
-            return searchTerms.some(term => {
-                // Exact match gets highest priority
-                if (searchText.includes(term)) return true;
-                
-                // Fuzzy matching for typos
-                return this.fuzzyMatch(term, searchText);
-            });
-        }).sort((a, b) => {
-            // Sort by relevance (how many search terms match)
-            const aMatches = searchTerms.filter(term => 
-                a.keywords.some(keyword => keyword.includes(term))
-            ).length;
-            const bMatches = searchTerms.filter(term => 
-                b.keywords.some(keyword => keyword.includes(term))
-            ).length;
-            
-            return bMatches - aMatches;
-        });
-    }
-
-    fuzzyMatch(term, text, threshold = 0.6) {
-        // Simple fuzzy matching - you can enhance this
-        const words = text.split(' ');
-        return words.some(word => {
-            if (word.length < 3 || term.length < 3) return false;
-            
-            const similarity = this.calculateSimilarity(term, word);
-            return similarity >= threshold;
-        });
-    }
-
-    calculateSimilarity(str1, str2) {
-        const longer = str1.length > str2.length ? str1 : str2;
-        const shorter = str1.length > str2.length ? str2 : str1;
-        
-        if (longer.length === 0) return 1.0;
-        
-        const editDistance = this.levenshteinDistance(longer, shorter);
-        return (longer.length - editDistance) / longer.length;
-    }
-
-    levenshteinDistance(str1, str2) {
-        const matrix = [];
-        
-        for (let i = 0; i <= str2.length; i++) {
-            matrix[i] = [i];
-        }
-        
-        for (let j = 0; j <= str1.length; j++) {
-            matrix[0][j] = j;
-        }
-        
-        for (let i = 1; i <= str2.length; i++) {
-            for (let j = 1; j <= str1.length; j++) {
-                if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-                    matrix[i][j] = matrix[i - 1][j - 1];
-                } else {
-                    matrix[i][j] = Math.min(
-                        matrix[i - 1][j - 1] + 1,
-                        matrix[i][j - 1] + 1,
-                        matrix[i - 1][j] + 1
-                    );
+        // Add matching keywords
+        this.questions.forEach(q => {
+            q.keywords.forEach(keyword => {
+                if (keyword.toLowerCase().includes(query) && suggestions.size < 5) {
+                    suggestions.add(keyword);
                 }
+            });
+        });
+        
+        // Add matching categories
+        this.questions.forEach(q => {
+            if (q.category.toLowerCase().includes(query) && suggestions.size < 5) {
+                suggestions.add(q.category);
             }
+        });
+
+        if (suggestions.size > 0) {
+            suggestionsDiv.innerHTML = Array.from(suggestions)
+                .map(suggestion => `<div class="suggestion-item" onclick="searchSuggestion('${suggestion}')">${suggestion}</div>`)
+                .join('');
+            suggestionsDiv.style.display = 'block';
+        } else {
+            suggestionsDiv.style.display = 'none';
+        }
+    }
+
+    hideSearchSuggestions() {
+        const suggestionsDiv = document.getElementById('searchSuggestions');
+        if (suggestionsDiv) {
+            suggestionsDiv.style.display = 'none';
+        }
+    }
+
+    filterByCategory(category) {
+        if (category === 'ALL') {
+            this.filteredQuestions = [...this.questions];
+        } else {
+            this.filteredQuestions = this.questions.filter(q => q.category === category);
         }
         
-        return matrix[str2.length][str1.length];
+        this.currentPage = 1;
+        this.renderQuestions();
+        this.renderPagination();
     }
 
-    displayResults(results) {
-        this.hideAllSections();
-        this.resultsSection.style.display = 'block';
-        
-        this.resultsContent.innerHTML = results.map(question => this.createResultCard(question)).join('');
-        
-        // Initialize code highlighting
-        setTimeout(() => {
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }, 100);
+    clearFilters() {
+        this.filteredQuestions = [...this.questions];
+        this.currentPage = 1;
+        document.getElementById('searchInput').value = '';
+        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector('.category-btn[data-category="ALL"]').classList.add('active');
+        this.renderQuestions();
+        this.renderPagination();
+        this.hideSearchSuggestions();
     }
 
-    createResultCard(question) {
-        const codeLanguage = question.code.includes('#include') ? 'c' : 'cpp';
+    renderQuestions() {
+        const container = document.getElementById('questionsContainer');
+        if (!container) return;
         
-        return `
-            <div class="result-card" data-question-id="${question.id}">
-                <div class="result-header">
-                    <div class="result-icon">
-                        <i class="fas fa-code"></i>
-                    </div>
-                    <div class="result-title">
-                        <h2>${this.truncateText(question.question, 100)}</h2>
-                        <div class="result-meta">
-                            <span class="meta-tag">${question.category}</span>
-                            <span class="meta-tag">Question #${question.id}</span>
-                        </div>
-                    </div>
+        const startIndex = (this.currentPage - 1) * this.questionsPerPage;
+        const endIndex = startIndex + this.questionsPerPage;
+        const currentQuestions = this.filteredQuestions.slice(startIndex, endIndex);
+        
+        if (currentQuestions.length === 0) {
+            container.innerHTML = '<div class="no-results">No questions found matching your criteria.</div>';
+            return;
+        }
+        
+        container.innerHTML = currentQuestions.map(q => `
+            <div class="question-card" data-id="${q.id}">
+                <div class="question-header">
+                    <span class="question-id">Q${q.id}</span>
+                    <span class="question-category">${q.category}</span>
                 </div>
-                
-                <div class="result-content">
-                    <div class="question-text">
-                        <p><strong>Problem:</strong> ${question.description}</p>
-                        ${question.constraints ? `<p><strong>Constraints:</strong> ${question.constraints}</p>` : ''}
-                        ${question.sampleInput ? `
-                            <p><strong>Sample Input:</strong></p>
-                            <pre>${question.sampleInput}</pre>
-                            <p><strong>Sample Output:</strong> ${question.sampleOutput}</p>
-                        ` : ''}
-                    </div>
-                    
-                    <div class="code-section">
-                        <h3><i class="fas fa-terminal"></i> Solution Code</h3>
-                        <div class="code-container">
-                            <div class="code-header">
-                                <span class="code-language">${codeLanguage.toUpperCase()}</span>
-                                <button class="copy-btn" onclick="copyCode(${question.id})">
-                                    <i class="fas fa-copy"></i> Copy
-                                </button>
-                            </div>
-                            <pre class="code-block"><code class="language-${codeLanguage}" id="code-${question.id}">${this.escapeHtml(question.code)}</code></pre>
+                <h3 class="question-title">${q.question}</h3>
+                <p class="question-description">${q.description}</p>
+                <div class="question-constraints">
+                    <strong>Constraints:</strong> ${q.constraints}
+                </div>
+                ${q.sampleInput ? `
+                    <div class="sample-io">
+                        <div class="sample-input">
+                            <strong>Sample Input:</strong>
+                            <pre>${q.sampleInput}</pre>
+                        </div>
+                        <div class="sample-output">
+                            <strong>Sample Output:</strong>
+                            <pre>${q.sampleOutput}</pre>
                         </div>
                     </div>
+                ` : ''}
+                <div class="code-section">
+                    <div class="code-header">
+                        <strong>Solution:</strong>
+                        <button class="copy-btn" onclick="copyCode(${q.id})">Copy Code</button>
+                    </div>
+                    <pre><code class="language-c" id="code-${q.id}">${this.escapeHtml(q.code)}</code></pre>
+                </div>
+                <div class="question-keywords">
+                    <strong>Keywords:</strong>
+                    ${q.keywords.map(keyword => `<span class="keyword-tag">${keyword}</span>`).join('')}
                 </div>
             </div>
-        `;
-    }
-
-    showNotFound() {
-        this.hideAllSections();
-        this.notFoundSection.style.display = 'block';
-    }
-
-    showLoading(show) {
-        const btnText = this.searchBtn.querySelector('.btn-text');
-        const btnLoading = this.searchBtn.querySelector('.btn-loading');
+        `).join('');
         
-        if (show) {
-            btnText.style.display = 'none';
-            btnLoading.style.display = 'inline-block';
-            this.searchBtn.disabled = true;
-        } else {
-            btnText.style.display = 'inline-block';
-            btnLoading.style.display = 'none';
-            this.searchBtn.disabled = false;
+        // Re-highlight code after rendering
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
         }
     }
 
-    hideAllSections() {
-        this.resultsSection.style.display = 'none';
-        this.notFoundSection.style.display = 'none';
+    renderPagination() {
+        const container = document.getElementById('paginationContainer');
+        if (!container) return;
+        
+        const totalPages = Math.ceil(this.filteredQuestions.length / this.questionsPerPage);
+        
+        if (totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+        
+        let paginationHTML = '';
+        
+        // Previous button
+        if (this.currentPage > 1) {
+            paginationHTML += `<button class="page-btn" onclick="elabAnswers.goToPage(${this.currentPage - 1})">Previous</button>`;
+        }
+        
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === this.currentPage) {
+                paginationHTML += `<button class="page-btn active">${i}</button>`;
+            } else {
+                paginationHTML += `<button class="page-btn" onclick="elabAnswers.goToPage(${i})">${i}</button>`;
+            }
+        }
+        
+        // Next button
+        if (this.currentPage < totalPages) {
+            paginationHTML += `<button class="page-btn" onclick="elabAnswers.goToPage(${this.currentPage + 1})">Next</button>`;
+        }
+        
+        container.innerHTML = paginationHTML;
     }
 
-    showError(message) {
-        alert(message); // You can replace this with a better error display
+    goToPage(page) {
+        this.currentPage = page;
+        this.renderQuestions();
+        this.renderPagination();
+        document.getElementById('questionsContainer').scrollIntoView({ behavior: 'smooth' });
     }
 
-    truncateText(text, maxLength) {
-        if (text.length <= maxLength) return text;
-        return text.substr(0, maxLength) + '...';
+    populateSearchSuggestions() {
+        // Pre-populate search suggestions for better UX
+        this.allKeywords = new Set();
+        this.questions.forEach(q => {
+            q.keywords.forEach(keyword => this.allKeywords.add(keyword));
+        });
     }
 
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+    escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 }
 
-// Global functions
-function searchSuggestion(query) {
-    document.getElementById('searchInput').value = query;
-    app.performSearch();
-}
-
-function clearSearch() {
-    document.getElementById('searchInput').value = '';
-    app.hideAllSections();
-}
-
+// Global functions for onclick handlers
 function copyCode(questionId) {
     const codeElement = document.getElementById(`code-${questionId}`);
-    const text = codeElement.textContent;
-    
-    navigator.clipboard.writeText(text).then(() => {
-        // Show success message
-        const copyBtn = codeElement.closest('.code-container').querySelector('.copy-btn');
-        const originalText = copyBtn.innerHTML;
-        
-        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        copyBtn.style.background = 'rgba(16, 185, 129, 0.2)';
-        
-        setTimeout(() => {
-            copyBtn.innerHTML = originalText;
-            copyBtn.style.background = 'transparent';
-        }, 2000);
-    }).catch(err => {
-        console.error('Failed to copy code:', err);
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-    });
+    if (codeElement) {
+        navigator.clipboard.writeText(codeElement.textContent).then(() => {
+            // Show feedback
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            btn.style.backgroundColor = '#27ae60';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.backgroundColor = '';
+            }, 2000);
+        });
+    }
 }
 
-// Initialize the app
-let app;
-document.addEventListener('DOMContentLoaded', () => {
-    app = new ElabAnswers();
+function searchSuggestion(suggestion) {
+    document.getElementById('searchInput').value = suggestion;
+    if (window.elabAnswers) {
+        window.elabAnswers.performSearch();
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    window.elabAnswers = new ElabAnswers();
 });
