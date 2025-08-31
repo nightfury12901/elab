@@ -7,7 +7,12 @@ const dsaQuestions = [
         question: "Suresh have \"N\" rectangles. A rectangle is Silver if the ratio of its sides is in between [1.6, 1.7], both inclusive. Your task is to find the number of silver rectangles.",
         description: "Find rectangles where the ratio of sides falls between 1.6 and 1.7 (inclusive).",
         constraints: "1 <= N <= 10^5, 1 <= W,H <= 10^9",
-        sampleInput: "5\n10 1\n165 100\n180 100\n170 100\n160 100",
+        sampleInput: "5
+10 1
+165 100
+180 100
+170 100
+160 100",
         sampleOutput: "3",
         code: `#include <stdio.h>
 #include<math.h>
@@ -205,7 +210,7 @@ void printArray(int arr[],int size)
     int i;
     for (i=0; i < size; i++)
         printf("%d ", arr[i]);
-    printf("\\n");
+    printf("\&");
 }
 int main()
 {
@@ -304,7 +309,7 @@ int main(){
             printf("-1");
         else
             printf("%d",temp2);
-        printf("\\n");
+        printf("\&");
     }
     return 0;
 }`,
@@ -384,7 +389,8 @@ void fill0X(int m, int n)
             if(j < c-1)
                 cout<<" ";
         }
-        cout <<"\\n";
+        cout <<"\
+";
     }
 }
 int main()
@@ -449,7 +455,8 @@ int main()
         {
             if(array[i]+array[j] == num)
             {
-                cout<<"["<<array[i]<<" "<<array[j]<<"]\\n";
+                cout<<"["<<array[i]<<" "<<array[j]<<"]\
+";
                 count++;
             }
         }
@@ -487,7 +494,8 @@ int main()
             max_count = i.second;
         }
     }
-    cout<<res<<"\\n";
+    cout<<res<<"\
+";
     return 0;
 }`,
         keywords: ["frequency", "most", "occurring", "hashmap"]
@@ -570,7 +578,8 @@ int main()
                 sum += C[i][j];
             }
         }
-        cout<<sum<<"\\n";
+        cout<<sum<<"\
+";
     }
     return 0;
 }`,
@@ -888,7 +897,8 @@ int main()
         question: "Find number of unique pairs (a,b) where a is maximum and b is second maximum in subarrays.",
         description: "Use stack to find pairs where elements are max and second max in some subarray.",
         constraints: "1 <= N <= 10^5",
-        sampleInput: "5\n12345",
+        sampleInput: "5
+12345",
         sampleOutput: "4",
         code: `#include <stdio.h>
 int main()
@@ -962,7 +972,7 @@ bool isOperand(char x){
 string getInfix(string exp)
 {
     stack<string> s;
-    for(int i=0; exp[i]!='\\0'; i++)
+    for(int i=0; exp[i]!='\0'; i++)
     {
         if(isOperand(exp[i]))
         {
@@ -1070,12 +1080,14 @@ void enqueue(int data) {
             front = 0;
         rear++;
         items[rear] = data;
-        printf("Enqueuing %d\\n", data);
+        printf("Enqueuing %d\
+", data);
     }
 }
 void display() {
     if (rear == -1)
-        printf("\\nQueue is Empty!!!");
+        printf("\
+Queue is Empty!!!");
     else {
         int i;
         for(i=front;i<=rear;i++)
@@ -1278,7 +1290,8 @@ int main() {
         i = query(0, 0, n, x) - 1;
         printf("%d ", aa[i]);
     }
-    printf("\\n");
+    printf("\
+");
     return 0;
 }`,
         keywords: ["segment", "tree", "remove", "elements", "positions"]
@@ -1397,11 +1410,13 @@ int main(){
     for(int i=1;i<=n;i++)fa[i]=fa2[i]=i;
     for(int i=1,x,y;i<=m1;i++)cin>>x>>y,fa[gf(x,fa)]=gf(y,fa);
     for(int i=1,x,y;i<=m2;i++)cin>>x>>y,fa2[gf(x,fa2)]=gf(y,fa2);
-    cout<<n-max(m1,m2)-1<<'\\n';
+    cout<<n-max(m1,m2)-1<<'\
+';
     for(int i=1;i<=n;i++){
         for(int j=i+1;j<=n;j++){
             if(gf(i,fa)!=gf(j,fa)&&gf(i,fa2)!=gf(j,fa2)){
-                cout<<i<<' '<<j<<'\\n';
+                cout<<i<<' '<<j<<'\
+';
                 fa[gf(i,fa)]=gf(j,fa);
                 fa2[gf(i,fa2)]=gf(j,fa2);
             }
@@ -1486,7 +1501,8 @@ int main()
         int u;
         char c;
         cin >> u >> c;
-        cout<<subroot[u][c-'a']<<"\\n";
+        cout<<subroot[u][c-'a']<<"\
+";
     }
     return 0;
 }`,
@@ -1654,12 +1670,14 @@ int main() {
         dout[i]++, din[j]++;
     }
     if (dout[0] - din[0] != 1 || din[n - 1] - dout[n - 1] != 1) {
-        printf("IMPOSSIBLE\\n");
+        printf("IMPOSSIBLE\
+");
         return 0;
     }
     for (i = 1; i < n - 1; i++)
         if (dout[i] != din[i]) {
-            printf("IMPOSSIBLE\\n");
+            printf("IMPOSSIBLE\
+");
             return 0;
         }
     e_ = new_L(0);
@@ -1670,12 +1688,14 @@ int main() {
         m--;
     }
     if (m != 0) {
-        printf("IMPOSSIBLE\\n");
+        printf("IMPOSSIBLE\
+");
         return 0;
     }
     for (e = e_; e; e = e->next)
         printf("%d ", e->j + 1);
-    printf("\\n");
+    printf("\
+");
     return 0;
 }`,
         keywords: ["eulerian", "path", "directed", "graph", "hierholzer"]
@@ -1731,7 +1751,8 @@ int main() {
     }
     for (i = 0; i < n; i++)
         if (dd[i] % 2) {
-            printf("IMPOSSIBLE\\n");
+            printf("IMPOSSIBLE\
+");
             return 0;
         }
     e_ = new_L(0);
@@ -1743,7 +1764,8 @@ int main() {
         m--;
     }
     if (m != 0) {
-        printf("IMPOSSIBLE\\n");
+        printf("IMPOSSIBLE\
+");
         return 0;
     }
     i = 0;
@@ -1751,7 +1773,8 @@ int main() {
         i ^= ij[e->h];
         printf("%d ", i + 1);
     }
-    printf("\\n");
+    printf("\
+");
     return 0;
 }`,
         keywords: ["mail", "delivery", "eulerian", "circuit", "undirected"]
@@ -1853,15 +1876,18 @@ int main() {
                         b = pp[b];
                     }
                     ii[k++] = b;
-                    printf("YES\\n");
+                    printf("YES\
+");
                     while(k--)
                         printf("%d ", ii[k] + 1);
-                    printf("\\n");
+                    printf("\
+");
                     return 0;
                 }
             }
         }
-    printf("NO\\n");
+    printf("NO\
+");
     return 0;
 }`,
         keywords: ["negative", "cycle", "bellman", "ford", "directed"]
@@ -1966,13 +1992,16 @@ int main() {
         link(i << 1, i << 1 ^ 1, m + i, n);
     s = 0, t = (n - 1) << 1 ^ 1;
     k = dinic(n * 2, s, t);
-    printf("%d\\n", k);
+    printf("%d\
+", k);
     while (k--) {
         cnt = path(s, t);
-        printf("%d\\n", cnt / 2);
+        printf("%d\
+", cnt / 2);
         for (i = 0; i < cnt; i += 2)
             printf("%d ", (qq[i] >> 1) + 1);
-        printf("\\n");
+        printf("\
+");
     }
     return 0;
 }`,
@@ -2041,7 +2070,8 @@ int main( void )
     }
     if( !test( 0 ) )
     {
-        printf( "-1\\n" );
+        printf( "-1\
+" );
         return 0;
     }
     for( i = k-1; i >= 0; --i)
@@ -2049,7 +2079,8 @@ int main( void )
         az_int64_t f = I64(1) << i;
         if( test( rejected | f ) ) rejected |= f; else sum += c[i];
     }
-    printf( "%" F64 "d\\n", sum);
+    printf( "%" F64 "d\
+", sum);
     return 0;
 }`,
         keywords: ["tokens", "connectivity", "greedy", "bitmask", "mst"]
@@ -2104,7 +2135,8 @@ int main() {
     }
     for (i = 0; i < n; i++)
         printf("%d ", dd[i] + qq[cc[i]]);
-    printf("\\n");
+    printf("\
+");
     return 0;
 }`,
         keywords: ["functional", "graph", "cycle", "detection", "path"]
@@ -2200,7 +2232,8 @@ int32_t main() {
         else
         {
             val=mx[val];
-            cout<<"Goodbye Rick\\n"<<val<<endl;
+            cout<<"Goodbye Rick\
+"<<val<<endl;
         }
     }
     return 0;
@@ -2264,9 +2297,11 @@ int main()
         int a,b;
         scanf("%d %d",&a,&b);
         if(v[a]==b)
-            printf("sami\\n");
+            printf("sami\
+");
         else
-            printf("canthi\\n");
+            printf("canthi\
+");
     }
     return 0;
 }`,
@@ -2316,10 +2351,12 @@ int main()
     
     for (i=0; i<cases; i++) {
         if (results[i] == 0) {
-            printf("Not possible\\n");
+            printf("Not possible\
+");
         }
         else {
-            printf("Possible\\n");
+            printf("Possible\
+");
         }
     }
     return 0;
