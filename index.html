@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>DSA Questions Example</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Elab Answers - SRM DSA Search</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>DSA App</h1>
-  <!-- Your HTML here -->
+    <header>
+        <h1>Elab Answers</h1>
+        <p>Search SRM Institute DSA Questions and Answers</p>
+    </header>
 
-  <!-- IMPORTANT: load data.js before script.js -->
-  <script src="data.js"></script>
-  <script src="script.js"></script>
+    <main>
+        <input id="searchInput" type="search" placeholder="Search by keywords, question, category..." autofocus />
+        <div id="results"></div>
+    </main>
+
+    <!-- Load data.js BEFORE script.js to avoid undefined errors -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
