@@ -4,116 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elab Answers - DSA Question Search</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <h1><i class="fas fa-code"></i> Elab Answers</h1>
-            <p>Find DSA questions and solutions from SRM elab platform</p>
-        </header>
+<div class="container">
+    <!-- Header -->
+    <header class="header">
+        <h1><i class="fas fa-code"></i> Elab Answers</h1>
+        <p>Find DSA questions and solutions from SRM elab platform</p>
+    </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Search Section -->
-            <section class="search-section">
-                <div class="search-box">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="searchInput" placeholder="Enter your DSA question here..." 
-                           aria-label="Search for DSA questions">
-                    <button id="searchBtn" class="search-btn">
-                        <span class="btn-text">Search</span>
-                        <i class="fas fa-spinner fa-spin btn-loading" style="display: none;"></i>
-                    </button>
-                </div>
-                <div class="search-suggestions">
-                    <p><strong>Try searching for:</strong></p>
-                    <div class="suggestions-tags">
-                        <span class="tag" onclick="searchSuggestion('silver rectangles')">silver rectangles</span>
-                        <span class="tag" onclick="searchSuggestion('binary search tree')">binary search tree</span>
-                        <span class="tag" onclick="searchSuggestion('linked list')">linked list</span>
-                        <span class="tag" onclick="searchSuggestion('stack')">stack</span>
-                        <span class="tag" onclick="searchSuggestion('queue')">queue</span>
-                        <span class="tag" onclick="searchSuggestion('sorting')">sorting</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Results Section -->
-            <section id="resultsSection" class="results-section" style="display: none;">
-                <div id="resultsContent"></div>
-            </section>
-
-            <!-- Not Found Section -->
-            <section id="notFoundSection" class="not-found-section" style="display: none;">
-                <div class="not-found-content">
-                    <i class="fas fa-search-minus"></i>
-                    <h2>Question Not Found</h2>
-                    <p>Sorry, we couldn't find a matching question in our database.</p>
-                    <div class="suggestions">
-                        <h3>Try searching for something else:</h3>
-                        <div class="alt-suggestions">
-                            <button onclick="searchSuggestion('array manipulation')" class="alt-btn">Array Questions</button>
-                            <button onclick="searchSuggestion('tree traversal')" class="alt-btn">Tree Questions</button>
-                            <button onclick="searchSuggestion('graph algorithms')" class="alt-btn">Graph Questions</button>
-                            <button onclick="searchSuggestion('dynamic programming')" class="alt-btn">DP Questions</button>
-                        </div>
-                    </div>
-                    <button onclick="clearSearch()" class="back-btn">
-                        <i class="fas fa-arrow-left"></i> Try Another Search
-                    </button>
-                </div>
-            </section>
-
-            <!-- Stats Section -->
-            <section class="stats-section">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <i class="fas fa-question-circle"></i>
-                        <div class="stat-info">
-                            <span class="stat-number">50+</span>
-                            <span class="stat-label">DSA Questions</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-code-branch"></i>
-                        <div class="stat-info">
-                            <span class="stat-number">12</span>
-                            <span class="stat-label">Topics Covered</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-university"></i>
-                        <div class="stat-info">
-                            <span class="stat-number">SRM</span>
-                            <span class="stat-label">Institute</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>&copy; 2025 Elab Answers. Built for SRM students by students.</p>
-            <div class="footer-links">
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer">
-                    <i class="fab fa-github"></i> GitHub
-                </a>
+    <main class="main-content">
+        <!-- Search section -->
+        <section class="search-section">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Enter your DSA question here..." aria-label="Search for DSA questions">
+                <button id="searchBtn" class="search-btn">
+                    <span class="btn-text">Search</span>
+                    <i class="fas fa-spinner fa-spin btn-loading" style="display: none;"></i>
+                </button>
             </div>
-        </footer>
-    </div>
-    <!-- Load data first -->
-    <script src="data.js"></script>
-    <!-- Then load Prism.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
-    <!-- Finally load the main script -->
-    <script src="script.js"></script>
-
-
+            <div id="searchSuggestions" class="autocomplete-suggestions"></div>
+            <div class="search-suggestions">
+                <p><strong>Try searching for:</strong></p>
+                <div class="suggestions-tags">
+                    <span class="tag" onclick="searchSuggestion('silver rectangles')">silver rectangles</span>
+                    <span class="tag" onclick="searchSuggestion('binary search tree')">binary search tree</span>
+                    <span class="tag" onclick="searchSuggestion('linked list')">linked list</span>
+                    <span class="tag" onclick="searchSuggestion('stack')">stack</span>
+                    <span class="tag" onclick="searchSuggestion('queue')">queue</span>
+                    <span class="tag" onclick="searchSuggestion('sorting')">sorting</span>
+                </div>
+            </div>
+        </section>
+        <!-- Category Bar (Optional, you can comment if not needed) -->
+        <!--
+        <div class="category-bar">
+            <button class="category-btn active" data-category="ALL">All</button>
+            <button class="category-btn" data-category="SEARCHING">Searching</button>
+            <button class="category-btn" data-category="SORTING">Sorting</button>
+            <button class="category-btn" data-category="ARRAYS">Arrays</button>
+            <button class="category-btn" data-category="LINKED LIST">Linked List</button>
+            <button class="category-btn" data-category="TREE">Tree</button>
+            <button class="category-btn" data-category="GRAPH">Graph</button>
+            <button class="category-btn" data-category="HASHING">Hashing</button>
+        </div>
+        -->
+        <!-- Questions and Pagination -->
+        <section id="questionsSection">
+            <div id="questionsContainer"></div>
+            <div id="paginationContainer"></div>
+        </section>
+        <!-- Not Found Section -->
+        <section id="notFoundSection" class="not-found-section" style="display: none;">
+            <div class="not-found-content">
+                <i class="fas fa-search-minus"></i>
+                <h2>Question Not Found</h2>
+                <p>Sorry, we couldn't find a matching question in our database.</p>
+                <div class="suggestions">
+                    <h3>Try searching for something else:</h3>
+                    <div class="alt-suggestions">
+                        <button onclick="searchSuggestion('array manipulation')" class="alt-btn">Array Questions</button>
+                        <button onclick="searchSuggestion('tree traversal')" class="alt-btn">Tree Questions</button>
+                        <button onclick="searchSuggestion('graph algorithms')" class="alt-btn">Graph Questions</button>
+                        <button onclick="searchSuggestion('dynamic programming')" class="alt-btn">DP Questions</button>
+                    </div>
+                </div>
+                <button onclick="clearSearch()" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Try Another Search
+                </button>
+            </div>
+        </section>
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-question-circle"></i>
+                    <div class="stat-info">
+                        <span class="stat-number">50+</span>
+                        <span class="stat-label">DSA Questions</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-code-branch"></i>
+                    <div class="stat-info">
+                        <span class="stat-number">12</span>
+                        <span class="stat-label">Topics Covered</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-university"></i>
+                    <div class="stat-info">
+                        <span class="stat-number">SRM</span>
+                        <span class="stat-label">Institute</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Elab Answers. Built for SRM students by students.</p>
+        <div class="footer-links">
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-github"></i> GitHub
+            </a>
+        </div>
+    </footer>
+</div>
+<!-- Load data.js first -->
+<script src="data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
