@@ -8,11 +8,11 @@ const dsaQuestions = [
         description: "Find rectangles where the ratio of sides falls between 1.6 and 1.7 (inclusive).",
         constraints: "1 <= N <= 10^5, 1 <= W,H <= 10^9",
         sampleInput: "5
-        10 1
-        165 100
-        180 100
-        170 100
-        160 100",
+                      10 1
+                      165 100
+                      180 100
+                      170 100
+                      160 100",
         sampleOutput: "3",
         code: `#include <stdio.h>
         #include<math.h>
